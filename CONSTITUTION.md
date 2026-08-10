@@ -4,11 +4,7 @@
 
 This document states **principles, not tools or languages**. The language, frameworks, libraries, and lint rules live in `AGENTS.md`, the skills, and the ADRs — never here. Exemplars use neutral type notation (sum types and `name : Input -> Output`) so no principle pins to one stack.
 
-Each rule is a machine-readable YAML block: `do` and `dont` are lists of single atomic directives, `harm` names the consequence, `gate` names the primary enforcement mechanism, `check` names the verification criterion, and — only where wrong and right look alike — a structured `example`. Comply with the directive and its harm, not the prose around it.
-
-A rule id is `CONST-<family><n>`, where the family letter names what the rule is about and never where it sits — `CONST-P3` is a purity rule living in Article II. Ids are never renumbered and never reused: a deleted rule leaves its number vacant, so a citation to it resolves to nothing rather than to something else.
-
-Every `harm` is the stated rationale for its rule, not a measured finding. None is a claim that the consequence has been observed at a given rate. Read a `harm` as the reason the rule exists; read a `gate` as the only thing that establishes the rule held.
+Every `harm` is the stated rationale for its rule, not a measured finding — none is a claim that the consequence has been observed at a given rate. Comply with the directive and its harm, not the prose around them, and read a `gate` as the only thing that establishes a rule held.
 
 ## Application
 

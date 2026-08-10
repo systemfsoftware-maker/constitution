@@ -22,9 +22,13 @@ Before making changes:
 
 ## Amending the Constitution
 
+### Writing a rule
+
+A rule is a fenced YAML block carrying `id`, `title`, `gate`, `do`, `dont`, `harm`, `check`, and — only where wrong and right look alike — `example`, `scope`, or `layers`. Do not restate that list anywhere: `pnpm test` owns it, and rejects a missing field, an unknown one, or an unregistered `gate` value.
+
 ### Minting an id
 
-Pick the family letter from what the rule is **about**, never from the article it lands in — a family spans articles, which is why `CONST-P3` (purity) lives in Article II. The number is the next free one in that family: mint order, not a position.
+A rule id is `CONST-<family><n>`. Pick the family letter from what the rule is **about**, never from the article it lands in — a family spans articles, which is why `CONST-P3` (purity) lives in Article II. The number is the next free one in that family: mint order, not a position.
 
 | letter | family | fires when you are |
 |---|---|---|

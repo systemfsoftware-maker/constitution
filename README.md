@@ -1,6 +1,6 @@
 # Constitution
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
 [![System F Software](https://img.shields.io/badge/systemfsoftware.com-constitution-black?style=flat-square)](https://systemfsoftware.com/constitution)
 [![Source of truth](https://img.shields.io/badge/source-single-purple?style=flat-square)](CONSTITUTION.md)
 
@@ -117,4 +117,4 @@ Development workflow, commit conventions, and verification commands: [AGENTS.md]
 
 ## License
 
-[MIT](LICENSE) © 2026 Ryan Lee.
+[Apache-2.0](LICENSE) © 2026 Ryan Lee.

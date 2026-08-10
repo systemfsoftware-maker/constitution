@@ -6,6 +6,8 @@ This document states **principles, not tools or languages**. The language, frame
 
 Each rule is a machine-readable YAML block: `do` and `dont` are lists of single atomic directives, `harm` names the consequence, `gate` names the primary enforcement mechanism, `check` names the verification criterion, and — only where wrong and right look alike — a structured `example`. Rule ids (`A.1` … `V.7`) are stable; external documents cross-reference them. Comply with the directive and its harm, not the prose around it.
 
+Every `harm` is the stated rationale for its rule, not a measured finding. None is a claim that the consequence has been observed at a given rate. Read a `harm` as the reason the rule exists; read a `gate` as the only thing that establishes the rule held.
+
 ## Application
 
 ```yaml
@@ -30,12 +32,13 @@ rules:
     do: treat "done" as a gate passed or a test shown
     dont: accept a reported score or a claimed "it works" as done
     harm: compliance claimed without evidence
-    check: no evidence, no compliance
+    check: review — done names the gate that passed or the test that ran; a report of either is not either
   - id: A.4
     title: Supreme
     gate: review
     do:
-      - govern AGENTS.md, lint, and the ADRs where they conflict
+      - govern AGENTS.md, lint, and the ADRs on what a rule should say, where they conflict
+      - defer to the gate on whether a rule held — where this document and a gate disagree about a specific change, the gate is the final word (A.2) and the disagreement is resolved by amending one of them, never by overriding the gate in place
       - place contestable choices — suffixes, patterns, module shape — in ADRs
     dont: pin contestable choices in this document
     harm: contestable choices frozen as supreme law; conflicts left unresolved
@@ -352,3 +355,5 @@ rules:
       right: delete the three, keep one parameterised formatter
       wrong_state: add a guard for the impossible state the record permits
       right_state: delete the record; a tagged union makes the state unconstructable
+
+```

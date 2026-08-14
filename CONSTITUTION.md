@@ -157,11 +157,15 @@ rules:
       right: "getUser : UserId -> Effect<User, NotFound> — a lazy value, interpreted once at the edge"
   - id: CONST-B3
     title: The I/O Sandwich
-    gate: review
-    do: shape every outside interaction as read (impure) → transform (pure) → write (impure); the shell calls the core directly
-    dont: insert a layer that only passes work through without a read, transform, or write
-    harm: side effects leak into business logic; pass-through layers add coupling for nothing
-    check: review — pass-through delegation is the violation; the shell doing the read/transform/write, or sitting between transport and core, is not
+    gate: type-checker
+    do:
+      - shape every outside interaction as read (impure) → transform (pure) → write (impure); the shell calls the core directly
+      - express the interaction as one description whose phases chain by type — each phase's return type carries the required member the next phase's parameter demands — so the order is a consequence of the types and composing them wrongly fails to compile
+    dont:
+      - insert a layer that only passes work through without a read, transform, or write
+      - state the order beside a hand-written body and call it enforced; a sequence asserted in prose is decided by nothing
+    harm: side effects leak into business logic; pass-through layers add coupling for nothing; and an order nothing decides reads as a guarantee while permitting every permutation
+    check: type-checker — where the interaction is one description, composing the phases in the wrong order omits the required member, so the compiler names the phase that must come first; review — pass-through delegation, and the order of a hand-written body, which no type decides
     example:
       flow: |
         read → decode → decide → shape → write

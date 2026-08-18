@@ -118,32 +118,32 @@ def main():
         except FileNotFoundError:
             fail([f"{p}: missing — the corpus is both files, and half a corpus "
                   f"scores exactly like a whole one"])
-    text = "\n".join(texts.values())
 
     blocks = []
     for p, t in texts.items():
         found = re.findall(r"```yaml\n(.*?)```", t, re.S)
         if not found:
             errors.append(f"{p}: no fenced yaml rule blocks found")
-        blocks.extend((p, b) for b in found)
+        blocks.extend((p, j, b) for j, b in enumerate(found))
     if not blocks:
-        fail(["no fenced yaml rule blocks found in any corpus file"])
+        errors.append("no fenced yaml rule blocks found in any corpus file")
+        fail(errors)
 
     rules = []
-    for i, (p, block) in enumerate(blocks):
+    for p, j, block in blocks:
         try:
             doc = yaml.safe_load(block)
         except yaml.YAMLError as e:
-            errors.append(f"{p} block {i}: YAML parse error: {e}")
+            errors.append(f"{p} block {j}: YAML parse error: {e}")
             continue
         rules.extend(doc.get("rules", []))
 
     parsed_ids = [str(r.get("id")) for r in rules]
-    declared_ids = ID_IN_TEXT_RE.findall(text)
+    declared_ids = [i for t in texts.values() for i in ID_IN_TEXT_RE.findall(t)]
     uncovered = [i for i in declared_ids if i not in parsed_ids]
     if uncovered:
         errors.append(
-            f"{len(uncovered)} rule(s) declared in the file but never parsed "
+            f"{len(uncovered)} rule(s) declared in the corpus but never parsed "
             f"into a yaml block: {uncovered} — check for an unterminated ```yaml fence"
         )
 
@@ -180,13 +180,19 @@ def main():
         if ex is not None and not (isinstance(ex, dict) and all(isinstance(v, str) for v in ex.values())):
             errors.append(f"{rid}: 'example' must be a map of strings")
 
-    for p, t in texts.items():
-        for cited in sorted(set(CITE_RE.findall(t))):
-            if cited not in seen:
+    cites = {p: set(CITE_RE.findall(t)) for p, t in texts.items()}
+    for cited in sorted(set().union(*cites.values())):
+        if cited in seen:
+            continue
+        for p in PATHS:
+            if cited in cites.get(p, ()):
                 errors.append(f"dangling citation: '{cited}' is cited in {p} but names no rule")
 
     if args.against:
-        check_against(args.against, errors, dict(TITLE_IN_TEXT_RE.findall(text)))
+        live_titles = {}
+        for t in texts.values():
+            live_titles.update(TITLE_IN_TEXT_RE.findall(t))
+        check_against(args.against, errors, live_titles)
 
     if errors:
         fail(errors)

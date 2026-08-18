@@ -27,7 +27,11 @@ Before making changes:
 
 A rule goes in `CONSTITUTION.md` when its harm fires before you would know to look it up: nothing announces it, and no mechanism catches it after the fact. It goes in `CONSTITUTION-ARTICLES.md` when the work announces it — an artifact is in front of you (a domain type, a decision function, a boundary object, a test, a module's name) and a trigger can fire on writing it.
 
-The partition is not gated, deliberately. The obvious key — resident means `gate: review` — is a field the rule's own author writes, and it is false anyway: `CONST-B1`, `CONST-T2` and `CONST-N3` are review-gated and artifact-announced. Check: review — which of the two conditions above the rule meets. What *is* gated is that the union stays whole; `pnpm test` reads both files, so a rule dropped in a move fails coverage and a rule left in both fails on its id.
+Where both branches fit, resident wins. "The work announces it" means an artifact a *complying* agent can be expected to have in hand — not a trigger that exists in principle. That is why the S and W families stay resident even though the family table describes them by their artifacts: the agent who conceals a bypass, shrinks scope, or copies the neighbouring file is precisely the agent who does not fetch the document, so a trigger that fires on the artifact never reaches the reader who needed the rule.
+
+The partition is not gated, deliberately. The obvious key — resident means `gate: review` — is a field the rule's own author writes, and it is false anyway: `CONST-B1`, `CONST-T2` and `CONST-N3` are review-gated and artifact-announced. Check: review — which of the two conditions above the rule meets, and whether the precedence applies.
+
+What `pnpm test` gates about the two files is narrower than "the union stays whole", and the gap is stated because it was measured: a rule left in **both** files fails on its duplicate id; a corpus file that exists but declares no rule fails; a dropped rule fails while any citation to it survives. A dropped rule that nobody cites does **not** fail — 28 of 34 rules have no inbound citation — so `pnpm test --against <rev>` reports it instead: it names every id vacated since that revision, and every corpus file it could not compare because the file did not exist there. Read those two clauses on the success line; a green run that silently measured less is the defect this gate exists to prevent, and reporting is how it stays visible without failing every legitimate deletion.
 
 ### Writing a rule
 

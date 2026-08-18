@@ -91,7 +91,7 @@ The symlinks never change — they always point into `vendor/constitution/`, so 
 
 The Preamble and the Application block — how to read a rule, and how a principle is invoked, enforced, and resolved against another document — are resident alongside Article V.
 
-Each rule is a YAML block with `do`, `dont`, `harm`, `check`, and `gate` — machine-readable, agent-discoverable, and ready for property tests over the corpus. `pnpm test` validates both files as one corpus: ids are unique across it and citations resolve across it, so a rule lost in a move between the two fails the gate rather than passing quietly.
+Each rule is a YAML block with `do`, `dont`, `harm`, `check`, and `gate` — machine-readable, agent-discoverable, and ready for property tests over the corpus. `pnpm test` validates both files as one corpus: ids are unique across it, citations resolve across it, and a file that exists but declares no rule fails rather than scoring like a whole one. A rule dropped in a move fails while any citation to it survives; when nothing cites it, `pnpm test --against <rev>` names the vacated id on the success line instead, because failing every legitimate deletion would be worse than reporting one.
 
 ## Amendment
 

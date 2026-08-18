@@ -16,7 +16,10 @@ The corpus is two files — the resident law and the retrieved articles — and 
 union is the unit every check runs over. Ids are unique across it and citations
 resolve across it: CONST-S4 cites CONST-T5, which lives in the other file. Point
 this at one file and the coverage comparison above still passes, on a third of
-the rules, which is precisely the vacuous pass it exists to prevent.
+the rules, which is precisely the vacuous pass it exists to prevent. A file that
+is merely absent is not the only shape of that pass: a file present and parsing
+but declaring no rule scores identically, so every path in PATHS must contribute
+at least one rule of its own.
 
 There is no backwards compatibility and no retirement ledger. A deleted rule
 leaves its number vacant and a citation to it resolves to nothing, which is a

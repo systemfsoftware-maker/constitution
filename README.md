@@ -28,13 +28,24 @@ ln -s vendor/constitution/CONSTITUTION.md CONSTITUTION.md
 ln -s vendor/constitution/CONSTITUTION-ARTICLES.md CONSTITUTION-ARTICLES.md
 ```
 
+## Which file is which
+
+The two documents have **opposite lifecycles**. Point each at its harness the right way, or the law does not hold:
+
+| File | Lifecycle in a consumer repo | How the harness loads it |
+| --- | --- | --- |
+| **`CONSTITUTION.md`** | **Always on** — resident in every agent's context, on every run | `@CONSTITUTION.md` referenced from `AGENTS.md` / `CLAUDE.md` |
+| **`CONSTITUTION-ARTICLES.md`** | **On demand** — Articles I–IV, fetched only when a source file is written or edited | a path-scoped rule on **write/edit**, never on read, never always-on |
+
+The first file is the law of governance and work: how a principle is invoked, enforced, and grounded (the Preamble and Application block), plus Article V — Conduct. Nothing announces it and no mechanism catches it, so it has to be in context already. The second file is the craft law: Articles I–IV fire on the artifact they govern, when the work actually reaches it — deliver it at that moment, not on a read. Rendering it resident would tax every turn of every unrelated task; delaying the first file to retrieval lets a rule slip that should have held.
+
 ## The Problem
 
 Design principles live in CONTRIBUTING.md, ARCHITECTURE.md, PR comments, Slack threads, the senior engineer's head. None of those propagate. A new repo starts from a blank page; an old repo inherits yesterday's opinions; a reviewer enforces a rule nobody else has read. By the fifth service, the codebase has five different architectures and five different definitions of "done."
 
 ## The Solution
 
-The law ships as two documents. [`CONSTITUTION.md`](CONSTITUTION.md) is **resident** — it goes in every agent's context and stays there, and it carries only what nothing announces and no mechanism catches: how to read a rule, how a principle is invoked and enforced, and how work is conducted. [`CONSTITUTION-ARTICLES.md`](CONSTITUTION-ARTICLES.md) is **retrieved** — Articles I–IV, the craft law, delivered when the work reaches the artifact each one governs. Every repo under System F Software vendors both via `git subtree` and references them via symlink. **Amend it once here, and every consumer picks up the new law on its next subtree pull.** No forks. No copies. No drift.
+The law ships as two documents with opposite lifecycles — the mapping in ["Which file is which"](#which-file-is-which) is the short version. [`CONSTITUTION.md`](CONSTITUTION.md) is **always-on** — it goes into every agent's context and stays there, and it carries only what nothing announces and no mechanism catches: the Preamble, the Application block (how a rule is invoked and enforced), and Article V (Conduct). [`CONSTITUTION-ARTICLES.md`](CONSTITUTION-ARTICLES.md) is **on-demand** — Articles I–IV, the craft law, delivered when the work reaches the artifact each one governs. Every repo under System F Software vendors both via `git subtree` and references them via symlink. **Amend one here, and every consumer picks up the new law on its next subtree pull.** No forks. No copies. No drift.
 
 The split is not filing. A rule whose harm fires before you would know to look it up has to be resident or it does not hold; a rule the work itself announces costs every unrelated task attention it never needed. Residency is bought with every token of every turn, so it is spent only where retrieval cannot reach.
 
@@ -81,15 +92,15 @@ The symlinks never change — they always point into `vendor/constitution/`, so 
 
 ## Articles
 
-| Article | Delivery | Principle |
-| --- | --- | --- |
-| **I — The Pure Core** | retrieved | Decisions are pure; types come first; errors are variants; null is not a state; one path. |
-| **II — The Boundary** | retrieved | Functional core / imperative shell; effects are values; decode never cast; dependencies point inward. |
-| **III — Verification** | retrieved | The Testing Trophy; properties over examples; mutation is the measure. |
-| **IV — Organization** | retrieved | Organized by what it does; names scream the domain; fits in the head. |
-| **V — Conduct** | resident | Depth over expedience; challenge before you commit; subtract before you add. |
+| Article | File | In context | Principle |
+| --- | --- | --- | --- |
+| **I — The Pure Core** | `CONSTITUTION-ARTICLES.md` | on write/edit | Decisions are pure; types come first; errors are variants; null is not a state; one path. |
+| **II — The Boundary** | `CONSTITUTION-ARTICLES.md` | on write/edit | Functional core / imperative shell; effects are values; decode never cast; dependencies point inward. |
+| **III — Verification** | `CONSTITUTION-ARTICLES.md` | on write/edit | The Testing Trophy; properties over examples; mutation is the measure. |
+| **IV — Organization** | `CONSTITUTION-ARTICLES.md` | on write/edit | Organized by what it does; names scream the domain; fits in the head. |
+| **V — Conduct** | `CONSTITUTION.md` | **always on** | Depth over expedience; challenge before you commit; subtract before you add. |
 
-The Preamble and the Application block — how to read a rule, and how a principle is invoked, enforced, and resolved against another document — are resident alongside Article V.
+The Preamble and the Application block — how to read a rule, and how a principle is invoked, enforced, and resolved against another document — live in `CONSTITUTION.md` alongside Article V, always on.
 
 Each rule is a YAML block with `do`, `dont`, `harm`, `check`, and `gate` — machine-readable, agent-discoverable, and ready for property tests over the corpus. `pnpm test` validates both files as one corpus: ids are unique across it, citations resolve across it, and a file that exists but declares no rule fails rather than scoring like a whole one. A rule dropped in a move fails while any citation to it survives; when nothing cites it, `pnpm test --against <rev>` names the vacated id on the success line instead, because failing every legitimate deletion would be worse than reporting one.
 

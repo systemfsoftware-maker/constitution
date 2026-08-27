@@ -1,26 +1,5 @@
 # Constitution
 
-## Preamble
-
-This document states **principles, not tools or languages**. The language, frameworks, libraries, and lint rules live in `AGENTS.md`, the skills, and the ADRs — never here. Exemplars use neutral type notation (sum types and `name : Input -> Output`) so no principle pins to one stack.
-
-Every `harm` is the stated rationale for its rule, not a measured finding — none is a claim that the consequence has been observed at a given rate. Comply with the directive and its harm, not the prose around them, and read a `gate` as the only thing that establishes a rule held.
-
-## The Retrieved Articles
-
-Articles I–IV are **retrieved, not resident** — `CONSTITUTION-ARTICLES.md`. Each fires on the artifact it governs, on write or edit, never on read:
-
-| Article | Fires when you are authoring |
-| --- | --- |
-| I — The Pure Core | a domain type, or a decision function |
-| II — The Boundary | a handler, adapter, port, or composition root |
-| III — Verification | a test, or a judgement about one |
-| IV — Organization | a module's name, or its place in the tree |
-
-This document carries what no artifact announces and no mechanism catches. A rule whose harm fires before you would know to look lives here; a rule the work itself announces lives there. That is the whole partition — not importance, and not article order.
-
----
-
 ## Article V — Conduct
 
 ```yaml
@@ -58,7 +37,7 @@ rules:
   - id: CONST-W2
     title: Challenge Before You Commit
     gate: review
-    do: subject a large or irreversible choice to a deliberate challenge (another agent, a person, or rigorous self-examination), record it with the decision, judge it by the harm it names (CONST-G1)
+    do: subject a large or irreversible choice to a deliberate challenge (another agent, a person, or rigorous self-examination), record it with the decision, judge it by the harm it names
     dont:
       - appeal to a tribunal or standing authority
       - let a challenge become a clause quoted against a choice

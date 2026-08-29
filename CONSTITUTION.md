@@ -56,7 +56,7 @@ rules:
     do:
       - treat every line as a liability — removal is the default response to slop at every scale; adding is the exception you justify
       - small — unify duplicates, make bad states unrepresentable, delete a branch instead of guarding it
-      - structural — when the root violates this document and breeds a bug class, rebuild the core (behaviour pinned with characterization tests first, CONST-T5; decomposed into shippable milestones) rather than prune leaves off a rotten trunk
+      - structural — when the root violates this document and breeds a bug class, rebuild the core (published contract pinned first (CONST-T9); decomposed into shippable milestones) rather than prune leaves off a rotten trunk
       - distrust existing structure — assume rotten until it proves it conforms
     dont:
       - extend a copy-paste cluster with copy N+1
@@ -65,7 +65,7 @@ rules:
       - treat code as sound because it compiles, is large, or is old
       - mistake taste ("I'd write it differently") for rot
     harm: the codebase only grows; rot survives every patch and regrows; each copied pattern seeds the next, and the average drifts down
-    check: review reads the net line delta — a refactor/improvement/chore that adds net lines states why and names what it deleted (features and their tests are exempt); a fix that leaves a named root violation standing is rejected; "rotten" names the invariant the core breaks; a structural rebuild ships its characterization tests
+    check: review reads the net line delta — a refactor/improvement/chore that adds net lines states why and names what it deleted (features and their tests are exempt); a fix that leaves a named root violation standing is rejected; "rotten" names the invariant the core breaks; a structural rebuild ships a CONST-T9 pin on every published path it deletes
     example:
       wrong: add formatPhone() beside the three formatters already there
       right: delete the three, keep one parameterised formatter

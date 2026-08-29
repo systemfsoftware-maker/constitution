@@ -164,47 +164,46 @@ rules:
 
 ```yaml
 rules:
-  - id: CONST-T1
-    title: The Testing Trophy
+  - id: CONST-T8
+    title: The Observer Must See the Fault Class
     gate: review
-    do: invest widest at Composition, anchored by Static Analysis, made honest by Properties
-    dont: build a Test Pyramid — it buries logic in I/O and leaves the untested middle
-    harm: logic buried in I/O; the untested middle
-    check: review — layer investment follows the trophy widths
-    layers:
-      - width: ████
-        name: Static Analysis
-        scope: type checker, linter, dependency (DAG) checks
-        catches: Entire bug classes, zero maintenance
-      - width: ██████
-        name: Property Tests
-        scope: Core invariants, ACL roundtrips, schema conformance
-        catches: What the system guarantees
-      - width: ██████████████
-        name: Composition Tests
-        scope: Mocked I/O, real use cases, error paths
-        catches: Real workflows through the I/O sandwich
-      - width: ███
-        name: Contract Tests
-        scope: transport schema, CLI output
-        catches: External interface conformance
-  - id: CONST-T2
-    title: Properties Over Examples
+    do: enroll each behavior in the observer that can see its failure class — a pure decision is read by properties and by mutation of that decision; a published operation is read by tests that call only exported names; a shell that only translates is read by those exported-name tests, not by a suite of its own
+    dont:
+      - give the orchestrator its own test suite — extract the decision or live with the exported-name test
+      - enroll adapters, codecs, or wiring in the same mutant set as decisions
+      - treat a substitute whose expected value derives from the single implementation it replaces as an observer
+    harm: the wrong instrument reports coverage and measures nothing; mocked composition certifies wiring; a fat middle grows where decisions and I/O stay tangled
+    check: review — every new test names the surface it binds (decision or published export) and does not import a non-exported symbol to assert it
+  - id: CONST-T14
+    title: Properties Where the Surface Cannot Reach
     gate: review
-    do: prove the pure core with property tests; the type is the generator
-    dont: cover the core with hand-picked example unit tests
-    harm: a green suite that tests only the cases you imagined, breaking on every refactor
-    check: review — property-test presence on the core
+    do: prove a pure decision with a property when a universal over generated input, or a refusal no generated law can express, cannot be reached from the published surface; the type is the generator
+    dont:
+      - cover the core with hand-picked example unit tests
+      - write a property for a decision already fully pinned from above just because the decision is important
+    harm: a green suite that tests only the cases you imagined; or a property farm that restates the public contract and dies with it
+    check: review — each authored property names the universal the public surface cannot reach
   - id: CONST-T3
     title: Mutation Is the Measure
     gate: mutation
-    do: gate the core at a perfect mutation score; kill a survivor with a sharper property or by deleting the dead branch it exploits
+    do: gate a named, change-relevant mutated set at a perfect kill score; the set names the behavior it covers, and its scope is a cost decision, never a fault-majority claim; kill a survivor with a sharper property or by deleting the dead branch it exploits
     dont:
       - reach the number by a suppression comment
-      - reach the number by narrowing the mutated set
+      - reach the number by narrowing the mutated set after the fact
       - reach the number by lowering the gate
-    harm: a score certifying tests that notice nothing
-    check: mutation gate (break = 100); lint banning suppression and scope-narrowing
+      - let an empty mutated set pass
+      - treat a raw mutation percentage as comparable across changes or codebases
+    harm: a score certifying tests that notice nothing; an empty or author-shrunk set passing vacuously
+    check: mutation gate (break = 100) on the declared mutated set; lint banning suppression, scope-narrowing, and an empty set
+  - id: CONST-T13
+    title: Mutation Also Grades the Tests
+    gate: mutation
+    do: fail a run whose mutants all died if an authored property file defends nothing the rest of the suite does not; opt out in the mutation config, never by deleting the file the gate named
+    dont:
+      - treat a perfect mutant score as proof every test pulled its weight
+      - accuse a file that covered an unattributed kill
+    harm: toothless properties accumulate; deleting them to silence the gate removes the only named contract
+    check: mutation — the test-set verdict is part of the same run as the score
   - id: CONST-T4
     title: Behavior Lives Where the Mutator Sees It
     gate: lint
@@ -212,13 +211,54 @@ rules:
     dont: place behavior in a declaration file (types, schemas, constant data), excluded from mutation
     harm: a bug hidden behind a perfect score, in a file nothing mutates
     check: lint — declaration files contain no behavior
-  - id: CONST-T5
-    title: Pin Behavior Before You Rebuild
+  - id: CONST-T9
+    title: Pin the Published Contract Before You Delete a Path
     gate: review
-    do: before refactoring, cover the inputs the existing code accepts, with tests over real examples
-    dont: trust a mutation or property score to protect behavior you haven't pinned — they're blind to behavior you delete
-    harm: a rebuild silently drops a capability; the clean score certifies the regression
-    check: characterization tests over real fixtures; review
+    do: before removing or replacing a published operation, pin its observables (value, error variant, serialized document, process result) with examples or properties whose expected side is not the implementation under change; if the old operation still runs, compare old and new on the same published inputs until they agree, then delete old
+    dont:
+      - pin private functions
+      - derive expected values by running the implementation under change
+      - treat a mutation or property score as proof a deleted published capability still exists — those are blind to absence
+      - leave a persisted gold after the old path is gone unless the gold is externally authored, independently gated, and cheap to re-bless
+    harm: a rebuild silently drops a capability; same-session gold blesses the bug; a clean score after a delete is a silent regression
+    check: review — pins call only published names; each expected value names an independent source (spec clause, prior published major, second implementation, or a hand-written oracle next to the constructor)
+  - id: CONST-T10
+    title: The Oracle Is Not the System Under Test
+    gate: review
+    do: every assertion has an oracle the SUT did not produce — a spec literal, a fixture not generated by importing the module, a law relating two views of the same value, or a second implementation; generated round-trip laws on a type cover what the type accepts and nothing it should reject, so a hand-written refusal survives beside them at any specifiable refusal boundary
+    dont:
+      - compute expected by calling the SUT
+      - assert collaborator call graphs
+      - treat generated accept-laws as full coverage of a refinement
+    harm: a green suite that cannot fail when the behavior is wrong; widening a refinement leaves generated laws green
+    check: review — plus sabotage (after green, break one core law and one published field; at least one test must go red)
+  - id: CONST-T11
+    title: Snapshots and Differentials Are Published-Surface Oracles
+    gate: lint
+    do: snapshot only canonicalized published output; compare two implementations only of the same published operation (or a prior published major against current)
+    dont:
+      - snapshot or compare private helpers, mappers, or unexported modules
+      - snapshot a value small enough to be a property or a named example
+    harm: tests that fail on refactors callers cannot see and pass on contract breaks they can
+    check: lint — snapshot and differential fixtures are produced only through the package's published export map
+  - id: CONST-T12
+    title: Altitude Is What the Test Calls
+    gate: lint
+    do: decide a test's observer from what it imports and invokes — published names or a decision under mutation — never from a filename, folder, or suffix
+    dont: key which doctrine applies to a test on a label the author can rename
+    harm: a rename silently un-enrolls the file from its observer; the absence reads as coverage
+    check: lint — no rule that selects tests by filename suffix
+  - id: CONST-E5
+    title: A Gate's Key Is Recomputed, Never Reported
+    gate: review
+    do:
+      - key every gate on a recomputation from source bytes, a compiler verdict, or a rehash — never on a field the gated work's author supplied; when a gate reads a field, recompute that field in the same run
+      - treat a gate whose verdict the gated agent can produce or observe as unverified until an independent channel confirms it — an instrument the agent does not control, or review by someone who is not the gated agent
+    dont:
+      - accept a self-reported field, a presence flag, a metadata suffix, or a comment as evidence a property holds
+      - treat a mechanical gate's green as self-certifying
+    harm: a check keyed on author-supplied values passes everything and catches nothing, and the green then masks the broken invariant the gate exists to catch; an instrument correlated with the work under test can manufacture a verdict no single observer catches
+    check: review — each gate names the recomputation it runs and the independent channel that confirms its verdict
 ```
 
 ---

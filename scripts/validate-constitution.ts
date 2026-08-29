@@ -67,6 +67,8 @@ const GATE_VALUES: Record<string, true> = {
   "mutation": true,
   "review": true,
 };
+const KNOWN_FAMILIES = Object.keys(FAMILIES).sort().join(", ");
+const KNOWN_GATES = Object.keys(GATE_VALUES).sort().join(", ");
 
 type Rule = Record<string, unknown>;
 
@@ -75,9 +77,30 @@ function fail(errors: string[]): never {
   Deno.exit(1);
 }
 
-const args = Deno.args;
-const againstIndex = args.indexOf("--against");
-const against = againstIndex >= 0 ? args[againstIndex + 1] : undefined;
+function titlesFrom(text: string): Map<string, string> {
+  const titles = new Map<string, string>();
+  for (const m of text.matchAll(TITLE_IN_TEXT_RE)) titles.set(m[1], m[2]);
+  return titles;
+}
+
+const againstIndex = Deno.args.indexOf("--against");
+const againstEquals = Deno.args.find((a) => a.startsWith("--against="));
+const against = againstIndex >= 0
+  ? Deno.args[againstIndex + 1]
+  : againstEquals?.slice("--against=".length);
+const againstRequested = against !== undefined || againstIndex >= 0 ||
+  againstEquals !== undefined;
+if (againstRequested && (against === undefined || against.length === 0)) {
+  fail([
+    "--against requires a revision (form: --against <rev> or --against=<rev>) — a silently skipped comparison is the vacuous pass this gate exists to prevent",
+  ]);
+}
+const strayAgainst = Deno.args.find((a) =>
+  a.startsWith("--against") && a !== "--against" && !a.startsWith("--against=")
+);
+if (strayAgainst !== undefined) {
+  fail([`unknown flag '${strayAgainst}' — did you mean --against <rev>?`]);
+}
 
 const errors: string[] = [];
 
@@ -120,7 +143,8 @@ const parsedIds = rules.map((r) => String(r.id));
 const declaredIds = Object.values(texts).flatMap((t) =>
   [...t.matchAll(ID_IN_TEXT_RE)].map((m) => m[1])
 );
-const uncovered = declaredIds.filter((i) => !parsedIds.includes(i));
+const parsedIdSet = new Set(parsedIds);
+const uncovered = declaredIds.filter((i) => !parsedIdSet.has(i));
 if (uncovered.length > 0) {
   errors.push(
     `${uncovered.length} rule(s) declared in the corpus but never parsed into a yaml block: [${uncovered.join(", ")}] — check for an unterminated \`\`\`yaml fence`,
@@ -148,17 +172,15 @@ for (const r of rules) {
   }
   if (!ID_RE.test(rid)) {
     errors.push(`${rid}: id does not match ${ID_RE.source}`);
-  } else if (!(rid[6] in FAMILIES)) {
+  } else if (!Object.hasOwn(FAMILIES, rid["CONST-".length])) {
     errors.push(
-      `${rid}: family '${rid[6]}' is not registered — known families are [${Object.keys(FAMILIES).sort().join(", ")}]`,
+      `${rid}: family '${rid["CONST-".length]}' is not registered — known families are [${KNOWN_FAMILIES}]`,
     );
   }
   if (seen.has(rid)) errors.push(`${rid}: duplicate id`);
   seen.add(rid);
-  if (typeof r.gate !== "string" || !(r.gate in GATE_VALUES)) {
-    errors.push(
-      `${rid}: gate '${String(r.gate)}' not in [${Object.keys(GATE_VALUES).sort().join(", ")}]`,
-    );
+  if (typeof r.gate !== "string" || !Object.hasOwn(GATE_VALUES, r.gate)) {
+    errors.push(`${rid}: gate '${String(r.gate)}' not in [${KNOWN_GATES}]`);
   }
   for (const f of ["do", "dont"] as const) {
     const v = r[f];
@@ -198,26 +220,27 @@ async function checkAgainst(
 ): Promise<{ vacated: string[]; uncompared: string[] }> {
   const oldTitles = new Map<string, string>();
   const uncompared: string[] = [];
-  for (const p of PATHS) {
-    try {
+  try {
+    const results = await Promise.all(PATHS.map(async (p) => {
       const cmd = new Deno.Command("git", {
         args: ["show", `${rev}:${p}`],
         stdout: "piped",
         stderr: "piped",
       });
       const out = await cmd.output();
-      if (!out.success) {
-        uncompared.push(p);
+      if (!out.success) return { p, absent: true, titles: [] };
+      return { p, absent: false, titles: [...titlesFrom(new TextDecoder().decode(out.stdout))] };
+    }));
+    for (const r of results) {
+      if (r.absent) {
+        uncompared.push(r.p);
         continue;
       }
-      const oldText = new TextDecoder().decode(out.stdout);
-      for (const m of oldText.matchAll(TITLE_IN_TEXT_RE)) {
-        oldTitles.set(m[1], m[2]);
-      }
-    } catch (e) {
-      errors.push(`--against ${rev}: git is not runnable (${(e as Error).message})`);
-      return { vacated: [], uncompared: [] };
+      for (const [rid, title] of r.titles) oldTitles.set(rid, title);
     }
+  } catch (e) {
+    errors.push(`--against ${rev}: git is not runnable (${(e as Error).message})`);
+    return { vacated: [], uncompared: [] };
   }
 
   if (oldTitles.size === 0) {
@@ -246,7 +269,7 @@ let uncompared: string[] = [];
 if (against !== undefined) {
   const liveTitles = new Map<string, string>();
   for (const t of Object.values(texts)) {
-    for (const m of t.matchAll(TITLE_IN_TEXT_RE)) liveTitles.set(m[1], m[2]);
+    for (const [rid, title] of titlesFrom(t)) liveTitles.set(rid, title);
   }
   ({ vacated, uncompared } = await checkAgainst(against, errors, liveTitles));
 }

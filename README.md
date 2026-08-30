@@ -62,9 +62,10 @@ If the repository is brand new, create an initial commit first (`git commit --al
 
 1. Add `@CONSTITUTION.md` to `AGENTS.md` or `CLAUDE.md`.
 2. Set up a path-scoped rule (`.claude/rules/` or `.cursor/rules/`) to provide `CONSTITUTION-ARTICLES.md` when editing source files.
-3. Or install the OMP TTSR plugin to actively intercept violations during edits:
+3. Or add the marketplace and install the TTSR plugin to intercept violations during edits:
    ```bash
-   omp plugin install @systemfsoftware/omp-plugin-constitution
+   omp plugin marketplace add systemfsoftware/constitution
+   omp plugin install constitution@systemfsoftware-marketplace
    ```
 
 ---

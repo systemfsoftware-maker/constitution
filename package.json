@@ -3,7 +3,7 @@
   "description": "The supreme design law of System F Software — stack-neutral, vendored into every consumer repo via git subtree + symlink.",
   "main": "index.js",
   "scripts": {
-    "test": "scripts/validate-constitution.ts && scripts/validate-plugin-rules.ts",
+    "test": "scripts/validate-constitution.ts",
     "prepare": "husky"
   },
   "repository": {

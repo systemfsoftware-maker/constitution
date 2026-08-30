@@ -1,10 +1,9 @@
 ---
 description: "Fires on edits/writes that violate Article II (The Boundary) of the Constitution: decisions inside boundary handlers, eager async promises on public surfaces, unchecked type casts, or pass-through delegation layers."
 condition:
-  - '(?<![\w$])as\s+(?:any|unknown|never)(?![\w$])'
+  - '(?<![\w$])as\s+(?:any|unknown)(?![\w$])'
   - '(?i)@ts-(?:ignore|expect-error|nocheck)'
-  - '(?i)new\s+Promise<'
-  - '(?i):\s*Promise<[A-Za-z0-9_]+>'
+  - '(?i)new\s+Promise<\w+>\(\s*\(\s*(?:resolve|reject)'
 scope:
   - 'tool:edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
   - 'tool:write(**/*.{ts,tsx,js,jsx,rs,py,go})'

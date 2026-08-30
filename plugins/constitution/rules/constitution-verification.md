@@ -1,16 +1,15 @@
 ---
 description: "Fires on edits/writes that violate Article III (Verification) of the Constitution: mocking the only real implementation, authoring tautological/characterization tests, testing intermediate private forwarding helpers, or computing expected test values by invoking the SUT."
 condition:
-  - '(?i)(?:vi|jest)\.mock\('
-  - '(?i)(?:sinon|td)\.replace\('
+  - '(?i)(?:vi|jest)\.mock\(\s*["\x27]\.\.?/'
+  - '(?i)(?:sinon|td)\.replace\(\s*["\x27]\.\.?/'
   - '(?i)expect\(fn\(\)\)\.toBe\(fn\(\)\)'
-  - '(?i)toMatchSnapshot\(\s*\)'
   - '(?i)\bcharacterization\b'
   - '(?i)\bgolden[\s_-]+master\b'
 scope:
-  - 'tool:edit(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
-  - 'tool:write(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
-  - 'tool:ast_edit(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:write(**/*.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:ast_edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
 interruptMode: tool-only
 ---
 

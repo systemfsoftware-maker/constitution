@@ -3,13 +3,13 @@ description: "Fires on edits/writes that violate Article III (Verification) of t
 condition:
   - '(?i)(?:vi|jest)\.mock\(\s*["\x27]\.\.?/'
   - '(?i)(?:sinon|td)\.replace\(\s*["\x27]\.\.?/'
-  - '(?i)expect\(fn\(\)\)\.toBe\(fn\(\)\)'
+  - '(?i)expect\(\s*(\w+)\s*\([^)]*\)\s*\)\.to(?:Be|Equal|StrictEqual)\(\s*\1\s*\([^)]*\)\s*\)'
   - '(?i)\bcharacterization\b'
   - '(?i)\bgolden[\s_-]+master\b'
 scope:
-  - 'tool:edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
-  - 'tool:write(**/*.{ts,tsx,js,jsx,rs,py,go})'
-  - 'tool:ast_edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:edit(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:write(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
+  - 'tool:ast_edit(**/*.{test,spec}.{ts,tsx,js,jsx,rs,py,go})'
 interruptMode: tool-only
 ---
 

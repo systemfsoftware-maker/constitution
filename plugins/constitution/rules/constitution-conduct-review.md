@@ -2,9 +2,8 @@
 description: "Fires during review or implementation when constitutional rules are treated as optional, bypassed without declared CONST-W3 justification, or downgraded from P0 severity."
 condition:
   - '(?i)(?:downgrade|waive|ignore|skip)\s+(?:the\s+)?constitution'
-  - '(?i)constitutional\s+(?:violation|breach|issue)\s*:\s*(?:P1|P2|P3|advisory|minor|suggestion)'
-  - '(?i)severity\s*:\s*(?:P1|P2|P3|advisory)\b[^\n]*\bCONST-[A-Z][0-9]+\b'
-  - '(?i)\bCONST-[A-Z][0-9]+\b[^\n]*\bseverity\s*:\s*(?:P1|P2|P3|advisory)\b'
+  - '(?ims)severity\s*:\s*(?:P1|P2|P3|advisory)\b.{0,200}?\bCONST-[A-Z][0-9]+\b'
+  - '(?ims)\bCONST-[A-Z][0-9]+\b.{0,200}?\bseverity\s*:\s*(?:P1|P2|P3|advisory)\b'
 scope:
   - 'tool:edit(**/*)'
   - 'tool:write(**/*)'

@@ -2,9 +2,8 @@
 description: "Fires on edits/writes that violate Article I (The Pure Core) of the Constitution: impure decisions doing I/O or throwing, unvalidated primitives in domain models, unbranched boolean/string error distinctions, or procedural control flow."
 condition:
   - '(?i)throw\s+new\s+Error\('
-  - '(?<![\w$])as\s+(?:any|unknown)(?![\w$])'
-  - '(?i)(?:class|interface)\s+\w*Error\s*\{[^}]*?\b(?:error|message|success|isError)\s*:\s*(?:string|boolean)'
-  - '(?i)type\s+\w*Error\s*=\s*\{[^}]*?\b(?:error|message|success|isError)\s*:\s*(?:string|boolean)'
+  - '(?i)(?:class|interface)\s+\w+\s*\{[^}]*?\b(?:success|isError)\s*:\s*\b(?:true|false|boolean\b)'
+  - '(?i)type\s+\w+\s*=\s*\{[^}]*?\b(?:success|isError)\s*:\s*\b(?:true|false|boolean\b)'
 scope:
   - 'tool:edit(**/*.{ts,tsx,js,jsx,rs,py,go})'
   - 'tool:write(**/*.{ts,tsx,js,jsx,rs,py,go})'

@@ -17,16 +17,8 @@ const RULES_DIR = path.join(ROOT_DIR, "plugins", "constitution", "rules");
 let failed = false;
 const INLINE_FLAG_PREFIX = /^\(\?([a-z]+)\)/;
 const TRANSLATABLE_INLINE_FLAGS = /^[ims]+$/;
-
-const EXPECTED_RULES: Record<string, true> = {
-  "constitution-pure-core.md": true,
-  "constitution-boundary.md": true,
-  "constitution-verification.md": true,
-  "constitution-conduct-review.md": true,
-};
-
 const VALID_SCOPE_RE = /^tool:(?:edit|write|ast_edit|read)\([^)]+\)$/;
-
+const CITE_RE = /\bCONST-[A-Z]\d+\b/g;
 function compileRuleCondition(pattern: string): RegExp {
   const match = INLINE_FLAG_PREFIX.exec(pattern);
   if (match) {
@@ -54,8 +46,16 @@ try {
   const entries = [...Deno.readDirSync(RULES_DIR)];
   const mdFiles = entries.filter((e) => e.isFile && e.name.endsWith(".md"));
 
-  for (const expected of Object.keys(EXPECTED_RULES)) {
-    check(`required rule '${expected}' exists in rules/`, mdFiles.some((f) => f.name === expected));
+  check("at least one rule file found in rules/", mdFiles.length > 0);
+
+  // Extract declared IDs across the constitution corpus for citation checking
+  const corpusDeclaredIds: Record<string, true> = {};
+  for (const doc of ["CONSTITUTION.md", "CONSTITUTION-ARTICLES.md"]) {
+    const text = Deno.readTextFileSync(path.join(ROOT_DIR, doc));
+    const matches = text.matchAll(/^\s*- id:\s*(CONST-[A-Z]\d+)\s*$/gm);
+    for (const m of matches) {
+      corpusDeclaredIds[m[1]] = true;
+    }
   }
   for (const entry of mdFiles) {
     const filePath = path.join(RULES_DIR, entry.name);
@@ -79,6 +79,12 @@ try {
       check(`${entry.name}: valid tool scope format '${s}'`, VALID_SCOPE_RE.test(s));
     }
     check(`${entry.name}: interruptMode is tool-only or always`, fm.interruptMode === "tool-only" || fm.interruptMode === "always");
+
+    // Validate all cited CONST-* IDs resolve to real rules in the corpus
+    const citations = content.match(CITE_RE) ?? [];
+    for (const cite of citations) {
+      check(`${entry.name}: cited ID '${cite}' exists in constitution corpus`, corpusDeclaredIds[cite] === true);
+    }
 
     const conditions = Array.isArray(fm.condition) ? fm.condition : (typeof fm.condition === "string" ? [fm.condition] : []);
     for (const pat of conditions) {

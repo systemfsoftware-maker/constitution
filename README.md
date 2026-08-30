@@ -6,7 +6,7 @@
 
 Shared engineering laws for repositories at [System F Software](https://systemfsoftware.com).
 
-It sets baseline requirements for clean code: a pure functional core behind a thin imperative shell, domain types before logic, property tests, and deleting code before writing more. Principles are stack-neutral, so they apply to any language.
+It sets baseline requirements for clean code: a pure functional core behind a thin imperative shell, domain types before logic, mutation testing for decisions, and deleting code before writing more. Principles are stack-neutral, so they apply to any language.
 
 ```mermaid
 flowchart LR
@@ -71,9 +71,9 @@ If the repository is brand new, create an initial commit first (`git commit --al
 | :--- | :--- | :--- | :--- |
 | **I: Pure Core** | `CONSTITUTION-ARTICLES.md` | Retrieved | Pure decisions, explicit types, tagged error variants, no `null` states. |
 | **II: Boundaries** | `CONSTITUTION-ARTICLES.md` | Retrieved | Functional core / imperative shell, values for effects, decode inputs rather than casting. |
-| **III: Verification** | `CONSTITUTION-ARTICLES.md` | Retrieved | Testing Trophy, property tests over examples, mutation testing to measure coverage. |
+| **III: Verification** | `CONSTITUTION-ARTICLES.md` | Retrieved | Observer-fit test placement, properties by narrow grant, mutation as the measure, independent oracles, pinned published contracts. |
 | **IV: Organization** | `CONSTITUTION-ARTICLES.md` | Retrieved | Organize by domain responsibility, clear naming, keep modules small. |
-| **V: Conduct** | `CONSTITUTION.md` | **Always on** | Fix root causes, challenge decisions before committing, remove code before adding. |
+| **V: Conduct** | `CONSTITUTION.md` | **Always on** | Zero-appeal P0 review enforcement, fix root causes, challenge decisions before committing, remove code before adding. |
 
 ---
 
